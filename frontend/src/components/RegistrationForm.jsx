@@ -53,8 +53,8 @@ const RegistrationForm = () => {
                 <button onClick={() => navigate('/')} className="text-sm text-indigo-500 mb-4 hover:underline">&larr; Back to Home</button>
 
                 <div className="text-center mb-6">
-                    <h2 className="text-2xl font-bold text-gray-800">Integration Demo</h2>
-                    <p className="text-gray-500">Test Transaction: ₹499</p>
+                    <h2 className="text-2xl font-bold text-gray-800">Free Registration</h2>
+                    <p className="text-gray-500">Create an account to get started.</p>
                 </div>
 
                 {status === 'success' && (

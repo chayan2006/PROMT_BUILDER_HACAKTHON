@@ -33,6 +33,39 @@ class OrderRequest(BaseModel):
     amount: int
     currency: str = "INR"
 
+@app.get("/test-whatsapp")
+def test_whatsapp(to_phone: str):
+    try:
+        twilio_sid = os.getenv("TWILIO_SID")
+        twilio_token = os.getenv("TWILIO_TOKEN")
+        client = TwilioClient(twilio_sid, twilio_token)
+        
+        # Ensure format
+        if not to_phone.startswith("whatsapp:"):
+            to_phone = f"whatsapp:{to_phone}"
+
+        message = client.messages.create(
+            from_='whatsapp:+14155238886',
+            body="Test Message from SaaS Framework 🚀",
+            to=to_phone
+        )
+        return {"status": "success", "sid": message.sid}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+class LoginRequest(BaseModel):
+    email: str
+    name: str = "User"
+
+@app.post("/login")
+def login_endpoint(request: LoginRequest):
+    try:
+        from database import process_login_action
+        result = process_login_action(request.email, request.name)
+        return {"status": "success", "data": result}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 @app.post("/create-order")
 def create_order(request: OrderRequest):
     try:
@@ -70,3 +103,13 @@ def send_whatsapp():
         return {"status": "success", "sid": message.sid}
     except Exception as e:
         return {"status": "error", "message": str(e)}
+
+class ChatRequest(BaseModel):
+    messages: list
+    model: str = "phi3"
+
+@app.post("/chat")
+def chat_endpoint(request: ChatRequest):
+    from ai_service import generate_response
+    response = generate_response(request.messages, request.model)
+    return {"response": response}

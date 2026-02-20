@@ -78,7 +78,7 @@ const Subscription = () => {
                             setStatus('error');
                             setMessage('Payment successful but registration failed. Please contact support.');
                         }
-                    } catch (regError) {
+                    } catch {
                         setStatus('error');
                         setMessage('Network error during registration. Please contact support.');
                     }

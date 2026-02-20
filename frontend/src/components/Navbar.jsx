@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, CreditCard, UserPlus } from 'lucide-react';
+import { Home, CreditCard, UserPlus, LogIn } from 'lucide-react';
 
 const Navbar = () => {
     const location = useLocation();
@@ -29,6 +29,10 @@ const Navbar = () => {
                     <Link to="/register" className={`px-3 py-2 rounded-md text-sm font-medium flex items-center transition ${isActive('/register')}`}>
                         <UserPlus className="mr-2" size={16} />
                         Register
+                    </Link>
+                    <Link to="/login" className={`px-3 py-2 rounded-md text-sm font-medium flex items-center transition ${isActive('/login')}`}>
+                        <LogIn className="mr-2" size={16} />
+                        Login
                     </Link>
                 </div>
             </div>
