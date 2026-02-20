@@ -6,3 +6,5 @@ razorpay
 twilio
 pydantic
 supabase
+resend
+python-multipart

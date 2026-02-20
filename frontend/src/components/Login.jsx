@@ -35,8 +35,8 @@ const Login = () => {
 
                 // Optional redirect
                 setTimeout(() => {
-                    navigate('/');
-                }, 3000);
+                    navigate('/dashboard');
+                }, 1000);
             } else {
                 setStatus('error');
                 setMessage(response.data.message || 'Login failed.');

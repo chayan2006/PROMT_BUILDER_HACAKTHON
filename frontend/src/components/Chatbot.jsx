@@ -29,10 +29,20 @@ const Chatbot = () => {
                 content: msg.text
             }));
 
+            // Check for logged in user
+            let email = null;
+            const storedUser = localStorage.getItem('user');
+            if (storedUser) {
+                try {
+                    email = JSON.parse(storedUser).email;
+                } catch (e) { }
+            }
+
             // Updated to point to our backend endpoint
             const response = await axios.post('http://localhost:8000/chat', {
                 messages: history,
-                model: "phi3" // Or make this configurable
+                model: "phi3", // Or make this configurable
+                email: email
             });
 
             const botMessage = { text: response.data.response, sender: "bot" };
