@@ -17,6 +17,26 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from config_db import init_db
+init_db()
+
+import api_router
+import p1_marketplace
+import p2_finance
+import p3_fraud
+import p4_resume
+import p5_recommendation
+import p6_feedback
+
+# Add core routers
+app.include_router(api_router.router)
+app.include_router(p1_marketplace.router)
+app.include_router(p2_finance.router)
+app.include_router(p3_fraud.router)
+app.include_router(p4_resume.router)
+app.include_router(p5_recommendation.router)
+app.include_router(p6_feedback.router)
+
 # ==========================================
 # PHASE 5.3: SELF-HEALING AI ERROR HANDLING
 # ==========================================
@@ -82,13 +102,14 @@ def home():
     return {"status": "Ready for Hackathon!"}
 
 from pydantic import BaseModel
+from typing import Optional
 from database import process_framework_action, create_razorpay_order
 
 class User(BaseModel):
     name: str
     email: str
     phone: str
-    payment_id: str = None
+    payment_id: Optional[str] = None
 
 class OrderRequest(BaseModel):
     amount: int
@@ -163,6 +184,37 @@ def register_user(user: User, background_tasks: BackgroundTasks):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
+import hmac
+import hashlib
+
+@app.post("/webhook/razorpay")
+async def razorpay_webhook(request: Request):
+    """
+    Razorpay HMAC-SHA256 Webhook Verification
+    Required for P1 Online Marketplace Checkout
+    """
+    secret = os.getenv("RAZORPAY_WEBHOOK_SECRET", "change_me_in_production")
+    signature = request.headers.get("X-Razorpay-Signature")
+    
+    if not signature:
+        return {"status": "error", "message": "Missing Signature"}
+        
+    payload = await request.body()
+    
+    expected_signature = hmac.new(
+        secret.encode(), 
+        payload, 
+        hashlib.sha256
+    ).hexdigest()
+    
+    if expected_signature != signature:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="Invalid HMAC-SHA256 signature")
+        
+    # Processing valid webhook async via Celery or Kafka Stream
+    print("[WEBHOOK] Secure Razorpay transaction verified.")
+    return {"status": "success", "message": "Webhook Verified"}
+
 @app.post("/whatsapp")
 def send_whatsapp():
     try:
@@ -188,7 +240,7 @@ def send_whatsapp():
 class ChatRequest(BaseModel):
     messages: list
     model: str = "phi3"
-    email: str = None
+    email: Optional[str] = None
 
 @app.post("/chat")
 def chat_endpoint(request: ChatRequest):
